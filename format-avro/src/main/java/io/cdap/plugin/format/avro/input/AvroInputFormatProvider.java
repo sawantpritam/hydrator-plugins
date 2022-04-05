@@ -142,7 +142,7 @@ public class AvroInputFormatProvider extends PathTrackingInputFormatProvider<Avr
         }
       }
       if (firstRecord == null) {
-        context.getFailureCollector().addFailure("Could Not find non-empty file", null);
+        context.getFailureCollector().addFailure("Could not find a valid Avro file to parse schema.", null);
       }
     } catch (IOException e) {
       context.getFailureCollector().addFailure("Schema parse error", e.getMessage());
