@@ -37,6 +37,7 @@ import org.apache.hadoop.mapreduce.Job;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -188,7 +189,9 @@ public class DelimitedConfig extends PathTrackingConfig {
     for (Map.Entry<String, String> entry : getFileSystemProperties().entrySet()) {
       configuration.set(entry.getKey(), entry.getValue());
     }
-    Path filePath = getFilePathForSchemaGeneration(path, regexPathFilter, configuration, job);
+//    Path filePath = getFilePathForSchemaGeneration(path, regexPathFilter, configuration, job);
+    ArrayList<Path> paths = getFilePathForSchemaGeneration(path, regexPathFilter, configuration, job);
+    Path filePath = paths.get(0);
     DataTypeDetectorStatusKeeper dataTypeDetectorStatusKeeper = new DataTypeDetectorStatusKeeper();
     String line = null;
     String[] columnNames = null;

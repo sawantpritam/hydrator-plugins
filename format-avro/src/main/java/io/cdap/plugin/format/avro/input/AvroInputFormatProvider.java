@@ -41,6 +41,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.Job;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 import javax.annotation.Nullable;
 
@@ -117,6 +118,7 @@ public class AvroInputFormatProvider extends PathTrackingInputFormatProvider<Avr
     String filePath = conf.getProperties().getProperties().getOrDefault("path", null);
     SeekableInput seekableInput = null;
     FileReader<GenericRecord> dataFileReader = null;
+    GenericRecord firstRecord = null;
     try {
       Job job = JobUtils.createInstance();
       Configuration hconf = job.getConfiguration();
@@ -124,16 +126,24 @@ public class AvroInputFormatProvider extends PathTrackingInputFormatProvider<Avr
       for (Map.Entry<String, String> entry : conf.getFileSystemProperties().entrySet()) {
         hconf.set(entry.getKey(), entry.getValue());
       }
-      Path file = conf.getFilePathForSchemaGeneration(filePath, ".+\\.avro$", hconf, job);
-      DatumReader<GenericRecord> dataReader = new GenericDatumReader<>();
-      seekableInput = new FsInput(file, hconf);
-      dataFileReader = DataFileReader.openReader(seekableInput, dataReader);
-      GenericRecord firstRecord;
-      if (!dataFileReader.hasNext()) {
-        return null;
+      // Path file = conf.getFilePathForSchemaGeneration(filePath, ".+\\.avro$", hconf, job);
+
+      ArrayList<Path> paths = conf.getFilePathForSchemaGeneration(filePath, ".+\\.avro$", hconf, job);
+
+      for (Path file : paths) {
+        DatumReader<GenericRecord> dataReader = new GenericDatumReader<>();
+        seekableInput = new FsInput(file, hconf);
+        try {
+          dataFileReader = DataFileReader.openReader(seekableInput, dataReader);
+          firstRecord = dataFileReader.next();
+          return new AvroToStructuredTransformer().convertSchema(firstRecord.getSchema());
+        } catch (Exception e) {
+          continue;
+        }
       }
-      firstRecord = dataFileReader.next();
-      return new AvroToStructuredTransformer().convertSchema(firstRecord.getSchema());
+      if (firstRecord == null) {
+        context.getFailureCollector().addFailure("Could Not find non-empty file", null);
+      }
     } catch (IOException e) {
       context.getFailureCollector().addFailure("Schema parse error", e.getMessage());
     } finally {

@@ -36,6 +36,7 @@ import org.apache.parquet.avro.AvroParquetReader;
 import org.apache.parquet.hadoop.ParquetReader;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 import javax.annotation.Nullable;
 
@@ -92,6 +93,7 @@ public class ParquetInputFormatProvider extends PathTrackingInputFormatProvider<
   public Schema getDefaultSchema(FormatContext context) throws IOException {
     String filePath = conf.getProperties().getProperties().getOrDefault("path", null);
     ParquetReader reader = null;
+    GenericData.Record record = null;
     try {
       Job job = JobUtils.createInstance();
       Configuration hconf = job.getConfiguration();
@@ -99,10 +101,17 @@ public class ParquetInputFormatProvider extends PathTrackingInputFormatProvider<
       for (Map.Entry<String, String> entry : conf.getFileSystemProperties().entrySet()) {
         hconf.set(entry.getKey(), entry.getValue());
       }
-      final Path file = conf.getFilePathForSchemaGeneration(filePath, ".+\\.parquet$", hconf, job);
-      reader = AvroParquetReader.builder(file).build();
-      GenericData.Record record = (GenericData.Record) reader.read();
-      return Schema.parseJson(record.getSchema().toString());
+      ArrayList<Path> paths = conf.getFilePathForSchemaGeneration(filePath, ".+\\.parquet$", hconf, job);
+      for (Path file : paths) {
+        reader = AvroParquetReader.builder(file).build();
+        record = (GenericData.Record) reader.read();
+        if (record != null) {
+          return Schema.parseJson(record.getSchema().toString());
+        }
+      }
+      if (record == null) {
+        context.getFailureCollector().addFailure("Could Not find non-empty file", null);
+      }
     } catch (IOException e) {
       context.getFailureCollector().addFailure("Schema error", e.getMessage());
     } finally {
