@@ -115,8 +115,10 @@ public class PathTrackingConfig extends PluginConfig {
    * @param job job to retrieve the file system
    * @return {@link Path}
    */
-  public ArrayList<Path>
-    getFilePathForSchemaGeneration(String path, String regexPathFilter, Configuration configuration, Job job)
+  public ArrayList<Path> getFilePathForSchemaGeneration(String path, 
+                                                        String regexPathFilter, 
+                                                        Configuration configuration, 
+                                                        Job job)
     throws IOException {
     Path fsPath = new Path(path);
     // need this to load the extra class loader to avoid ClassNotFoundException for the file system
