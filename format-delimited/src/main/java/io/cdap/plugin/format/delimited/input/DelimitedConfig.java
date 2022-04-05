@@ -189,7 +189,6 @@ public class DelimitedConfig extends PathTrackingConfig {
     for (Map.Entry<String, String> entry : getFileSystemProperties().entrySet()) {
       configuration.set(entry.getKey(), entry.getValue());
     }
-//    Path filePath = getFilePathForSchemaGeneration(path, regexPathFilter, configuration, job);
     ArrayList<Path> paths = getFilePathForSchemaGeneration(path, regexPathFilter, configuration, job);
     Path filePath = paths.get(0);
     DataTypeDetectorStatusKeeper dataTypeDetectorStatusKeeper = new DataTypeDetectorStatusKeeper();
