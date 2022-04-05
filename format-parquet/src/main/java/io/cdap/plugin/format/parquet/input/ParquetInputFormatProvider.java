@@ -110,7 +110,7 @@ public class ParquetInputFormatProvider extends PathTrackingInputFormatProvider<
         }
       }
       if (record == null) {
-        context.getFailureCollector().addFailure("Could Not find non-empty file", null);
+        context.getFailureCollector().addFailure("Could not find a valid Parquet file to parse schema.", null);
       }
     } catch (IOException e) {
       context.getFailureCollector().addFailure("Schema error", e.getMessage());
