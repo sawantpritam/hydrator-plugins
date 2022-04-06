@@ -16,7 +16,7 @@ Properties
 
 **Format:** Format of the data to read.
 The format must be one of 'avro', 'blob', 'csv', 'delimited', 'json', 'parquet', 'text', 'tsv', or the
-name of any format plugin that you have deployed to your environment.
+name of any format plugin that you have deployed to your environment.co
 If the format is a macro, only the pre-packaged formats can be used.
 If the format is 'blob', every input file will be read into a separate record.
 The 'blob' format also requires a schema that contains a field named 'body' of type 'bytes'.
@@ -24,9 +24,19 @@ If the format is 'text', the schema must contain a field named 'body' of type 's
 
 **Get Schema:** Auto-detects schema from file. Supported formats are: avro, parquet, csv, delimited, tsv, blob 
 and text.
+
 Blob - is set by default as field named 'body' of type bytes.
+
 Text - is set by default as two fields: 'body' of type bytes and 'offset' of type 'long'.
+
 JSON - is not supported, user has to manually provide the output schema.
+
+Parquet - If Path is a directory, will search all "parquet" files, and read the first valid non-empty "parquet" 
+file's schema under the directory. Return error message if no non-empty "parquet" file is detected or all schemas 
+are invalid.
+
+Avro - If Path is a directory, will search all "avro" files, and read the first valid non-empty "avro" file's schema
+under the directory. Return error message if no non-empty "avro" file detected or all schemas are invalid.
 
 **Override:** A list of columns with the corresponding data types for whom the automatic data type detection gets
  skipped. 
