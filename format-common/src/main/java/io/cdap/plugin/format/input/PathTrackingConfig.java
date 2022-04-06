@@ -36,6 +36,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -115,16 +116,16 @@ public class PathTrackingConfig extends PluginConfig {
    * @param job job to retrieve the file system
    * @return {@link Path}
    */
-  public ArrayList<Path> getFilePathForSchemaGeneration(String path, 
-                                                        String regexPathFilter, 
-                                                        Configuration configuration, 
-                                                        Job job)
+  public List<Path> getFilePathsForSchemaGeneration(String path,
+                                                   String regexPathFilter,
+                                                   Configuration configuration,
+                                                   Job job)
     throws IOException {
     Path fsPath = new Path(path);
     // need this to load the extra class loader to avoid ClassNotFoundException for the file system
     FileSystem fs = JobUtils.applyWithExtraClassLoader(job, getClass().getClassLoader(),
                                                        f -> FileSystem.get(fsPath.toUri(), configuration));
-    final ArrayList<Path> paths = new ArrayList<>();
+    List<Path> paths = new ArrayList<Path>();
     if (!fs.exists(fsPath)) {
       throw new IOException("Input path not found");
     }
