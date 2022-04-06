@@ -36,7 +36,7 @@ import org.apache.parquet.avro.AvroParquetReader;
 import org.apache.parquet.hadoop.ParquetReader;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 
@@ -101,7 +101,7 @@ public class ParquetInputFormatProvider extends PathTrackingInputFormatProvider<
       for (Map.Entry<String, String> entry : conf.getFileSystemProperties().entrySet()) {
         hconf.set(entry.getKey(), entry.getValue());
       }
-      ArrayList<Path> paths = conf.getFilePathForSchemaGeneration(filePath, ".+\\.parquet$", hconf, job);
+      List<Path> paths = conf.getFilePathsForSchemaGeneration(filePath, ".+\\.parquet$", hconf, job);
       for (Path file : paths) {
         reader = AvroParquetReader.builder(file).build();
         record = (GenericData.Record) reader.read();
@@ -110,7 +110,9 @@ public class ParquetInputFormatProvider extends PathTrackingInputFormatProvider<
         }
       }
       if (record == null) {
-        context.getFailureCollector().addFailure("Could not find a valid Parquet file to parse schema.", null);
+        context.getFailureCollector().addFailure("Could not find a valid Parquet file to parse schema. " +
+                                                   "Expected to detect non-empty Parquet file with valid schema.",
+                                                 null);
       }
     } catch (IOException e) {
       context.getFailureCollector().addFailure("Schema error", e.getMessage());
