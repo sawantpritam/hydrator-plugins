@@ -120,7 +120,7 @@ public class PathTrackingConfig extends PluginConfig {
                                                    String regexPathFilter,
                                                    Configuration configuration,
                                                    Job job)
-    throws IOException {
+    throws IOException { 
     Path fsPath = new Path(path);
     // need this to load the extra class loader to avoid ClassNotFoundException for the file system
     FileSystem fs = JobUtils.applyWithExtraClassLoader(job, getClass().getClassLoader(),
