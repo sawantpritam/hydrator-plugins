@@ -136,22 +136,22 @@ public class AvroInputFormatProvider extends PathTrackingInputFormatProvider<Avr
           return new AvroToStructuredTransformer().convertSchema(firstRecord.getSchema());
         } catch (Exception e) {
           continue;
+        } finally {
+          if (dataFileReader != null) {
+            dataFileReader.close();
+          }
+          if (seekableInput != null) {
+            seekableInput.close();
+          }
         }
       }
       if (firstRecord == null) {
         context.getFailureCollector().addFailure("Could not find a valid Avro file to parse schema. " +
-                                                   "Expected to detect non-empty Avro file with valid schema.",
+                                                   "Expected to find non-empty Avro file with valid schema.",
                                                  null);
       }
     } catch (IOException e) {
       context.getFailureCollector().addFailure("Schema parse error", e.getMessage());
-    } finally {
-      if (dataFileReader != null) {
-        dataFileReader.close();
-      }
-      if (seekableInput != null) {
-        seekableInput.close();
-      }
     }
     return null;
   }
