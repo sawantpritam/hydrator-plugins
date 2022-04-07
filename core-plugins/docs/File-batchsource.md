@@ -16,7 +16,7 @@ Properties
 
 **Format:** Format of the data to read.
 The format must be one of 'avro', 'blob', 'csv', 'delimited', 'json', 'parquet', 'text', 'tsv', or the
-name of any format plugin that you have deployed to your environment.co
+name of any format plugin that you have deployed to your environment.
 If the format is a macro, only the pre-packaged formats can be used.
 If the format is 'blob', every input file will be read into a separate record.
 The 'blob' format also requires a schema that contains a field named 'body' of type 'bytes'.
