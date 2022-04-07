@@ -108,10 +108,13 @@ public class ParquetInputFormatProvider extends PathTrackingInputFormatProvider<
         if (record != null) {
           return Schema.parseJson(record.getSchema().toString());
         }
+        if (reader != null) {
+          reader.close();
+        }
       }
       if (record == null) {
         context.getFailureCollector().addFailure("Could not find a valid Parquet file to parse schema. " +
-                                                   "Expected to detect non-empty Parquet file with valid schema.",
+                                                   "Expected to find non-empty Parquet file with valid schema.",
                                                  null);
       }
     } catch (IOException e) {
