@@ -30,6 +30,7 @@ import io.cdap.cdap.etl.api.aggregation.GroupByAggregationDefinition;
 import io.cdap.cdap.etl.api.batch.BatchAggregator;
 import io.cdap.cdap.etl.api.batch.BatchAggregatorContext;
 import io.cdap.cdap.etl.api.batch.BatchRuntimeContext;
+import io.cdap.cdap.etl.api.engine.sql.StandardSQLCapabilities;
 import io.cdap.cdap.etl.api.lineage.field.FieldOperation;
 import io.cdap.cdap.etl.api.lineage.field.FieldTransformOperation;
 import io.cdap.cdap.etl.api.relational.CoreExpressionCapabilities;
@@ -62,7 +63,7 @@ import java.util.Set;
   "Supports `Average`, `Count`, `First`, `Last`, `Max`, `Min`,`Sum`,`Collect List`,`Collect Set`, " +
   "`Standard Deviation`, `Variance`, `Count Distinct` as aggregate functions.")
 public class GroupByAggregator extends RecordReducibleAggregator<AggregateResult>
-implements LinearRelationalTransform {
+  implements LinearRelationalTransform {
   private final GroupByConfig conf;
   private final HashMap<String, String> functionNameMap = new HashMap<String, String>() {{
     put("AVG", "Avg");
@@ -107,24 +108,31 @@ implements LinearRelationalTransform {
     put("ANYIF", "AnyIf");
   }};
 
+  // Ansi SQL aggregations
   private final HashMap<GroupByConfig.Function, String> functionSqlMap =
     new HashMap<GroupByConfig.Function, String>() {{
-    put(GroupByConfig.Function.AVG, "AVG(%s)");
-    put(GroupByConfig.Function.COUNT, "COUNT(%s)");
-    put(GroupByConfig.Function.MAX, "MAX(%s)");
-    put(GroupByConfig.Function.MIN, "MIN(%s)");
-    put(GroupByConfig.Function.STDDEV, "STDDEV_POP(%s)");
-    put(GroupByConfig.Function.SUM, "SUM(%s)");
-    put(GroupByConfig.Function.VARIANCE, "VAR_POP(%s)");
-    put(GroupByConfig.Function.COLLECTLIST, "ARRAY_AGG(%s IGNORE NULLS)");
-    put(GroupByConfig.Function.COLLECTSET, "ARRAY_AGG(DISTINCT %s IGNORE NULLS)");
-    put(GroupByConfig.Function.COUNTDISTINCT, "COUNT(DISTINCT %s) + IF(COUNTIF(%<s IS NULL) > 0, 1, 0)");
-    put(GroupByConfig.Function.COUNTNULLS, "COUNTIF(%s IS NULL)");
-    put(GroupByConfig.Function.CONCAT, "STRING_AGG(CAST(%s AS STRING), \", \")");
-    put(GroupByConfig.Function.CONCATDISTINCT, "STRING_AGG(DISTINCT CAST(%s AS STRING) , \", \")");
-    put(GroupByConfig.Function.LOGICALAND, "COALESCE(LOGICAL_AND(%s), TRUE)");
-    put(GroupByConfig.Function.LOGICALOR, "COALESCE(LOGICAL_OR(%s), FALSE)");
-  }};
+      put(GroupByConfig.Function.AVG, "AVG(%s)");
+      put(GroupByConfig.Function.MAX, "MAX(%s)");
+      put(GroupByConfig.Function.MIN, "MIN(%s)");
+      put(GroupByConfig.Function.STDDEV, "STDDEV_POP(%s)");
+      put(GroupByConfig.Function.SUM, "SUM(%s)");
+      put(GroupByConfig.Function.VARIANCE, "VAR_POP(%s)");
+      put(GroupByConfig.Function.COUNT, "COUNT(%s)");
+      put(GroupByConfig.Function.COUNTNULLS, "SUM(CASE WHEN %s IS NULL THEN 1 END)");
+      put(GroupByConfig.Function.COUNTDISTINCT,
+          "COUNT(DISTINCT %s) + CASE WHEN SUM(CASE WHEN %s IS NULL THEN 1 END) > 0 THEN 1 ELSE 0 END");
+    }};
+
+  // BigQuery specific aggregations
+  private final HashMap<GroupByConfig.Function, String> functionBQSqlMap =
+    new HashMap<GroupByConfig.Function, String>() {{
+      put(GroupByConfig.Function.COLLECTLIST, "ARRAY_AGG(%s IGNORE NULLS)");
+      put(GroupByConfig.Function.COLLECTSET, "ARRAY_AGG(DISTINCT %s IGNORE NULLS)");
+      put(GroupByConfig.Function.CONCAT, "STRING_AGG(CAST(%s AS STRING), \", \")");
+      put(GroupByConfig.Function.CONCATDISTINCT, "STRING_AGG(DISTINCT CAST(%s AS STRING) , \", \")");
+      put(GroupByConfig.Function.LOGICALAND, "COALESCE(LOGICAL_AND(%s), TRUE)");
+      put(GroupByConfig.Function.LOGICALOR, "COALESCE(LOGICAL_OR(%s), FALSE)");
+    }};
 
   private List<String> groupByFields;
   private List<GroupByConfig.FunctionInfo> functionInfos;
@@ -433,8 +441,7 @@ implements LinearRelationalTransform {
 
   @Override
   public Relation transform(RelationalTranformContext relationalTranformContext, Relation relation) {
-    Optional<ExpressionFactory<String>> expressionFactory = relationalTranformContext
-      .getEngine().getExpressionFactory(StringExpressionFactoryType.SQL);
+    Optional<ExpressionFactory<String>> expressionFactory = getExpressionFactory(relationalTranformContext);
     if (!expressionFactory.isPresent()) {
       return new InvalidRelation("Cannot find an Expression Factory");
     }
@@ -447,6 +454,29 @@ implements LinearRelationalTransform {
     return relation.groupBy(aggregationDefinition);
   }
 
+  private Optional<ExpressionFactory<String>> getExpressionFactory(RelationalTranformContext ctx) {
+    List<GroupByConfig.FunctionInfo> functionInfos = conf.getAggregates();
+    boolean requiresBigQueryCapability = false;
+
+    for (GroupByConfig.FunctionInfo aggregate : functionInfos) {
+      GroupByConfig.Function func = aggregate.getFunction();
+      // If the function is not supported in ANSI SQL or BigQuery, this relation cannot be handled by the engine.
+      if (!functionSqlMap.containsKey(func) && !functionBQSqlMap.containsKey(func)) {
+        return Optional.empty();
+      }
+
+      // If any of the functions requires BigQuery, set the requiresBigQueryCapability flag to true;
+      if (functionBQSqlMap.containsKey(func)) {
+        requiresBigQueryCapability = true;
+      }
+    }
+
+    // If the BigQuery capability is required, ensure the SQL engine supports this capability.
+    return requiresBigQueryCapability ?
+      ctx.getEngine().getExpressionFactory(StringExpressionFactoryType.SQL, StandardSQLCapabilities.BIGQUERY) :
+      ctx.getEngine().getExpressionFactory(StringExpressionFactoryType.SQL);
+  }
+
   private GroupByAggregationDefinition getAggregationDefinition(ExpressionFactory<String> expressionFactory,
                                                                 Relation relation) {
     List<String> groupByFields = conf.getGroupByFields();
@@ -455,25 +485,34 @@ implements LinearRelationalTransform {
     List<Expression> groupByExpressions = new ArrayList<>(groupByFields.size());
     Map<String, Expression> selectExpressions = new HashMap<>();
 
-    for (String field: groupByFields) {
+    for (String field : groupByFields) {
       String columnName = getColumnName(expressionFactory, relation, field);
       Expression groupByExpression = expressionFactory.compile(columnName);
       groupByExpressions.add(groupByExpression);
       selectExpressions.put(field, groupByExpression);
     }
 
-    for (GroupByConfig.FunctionInfo aggregate: functionInfos) {
+    for (GroupByConfig.FunctionInfo aggregate : functionInfos) {
       String alias = aggregate.getName();
       String columnName = getColumnName(expressionFactory, relation, aggregate.getField());
       GroupByConfig.Function function = aggregate.getFunction();
 
-      // Indicates that the function used is unsupported by aggregation pushdown
-      if (!functionSqlMap.containsKey(function)) {
-        return null;
+      // Check if this function is supported in ANSI SQL
+      if (functionSqlMap.containsKey(function)) {
+        String selectSql = String.format(functionSqlMap.get(function), columnName);
+        selectExpressions.put(alias, expressionFactory.compile(selectSql));
+        continue;
       }
 
-      String selectSql = String.format(functionSqlMap.get(function), columnName);
-      selectExpressions.put(alias, expressionFactory.compile(selectSql));
+      // Check if this function is supported in BigQuery.
+      if (functionBQSqlMap.containsKey(function)
+        && expressionFactory.getCapabilities().contains(StandardSQLCapabilities.BIGQUERY)) {
+        String selectSql = String.format(functionBQSqlMap.get(function), columnName);
+        selectExpressions.put(alias, expressionFactory.compile(selectSql));
+        continue;
+      }
+
+      return null;
     }
 
     aggregationDefinition = GroupByAggregationDefinition.builder()
