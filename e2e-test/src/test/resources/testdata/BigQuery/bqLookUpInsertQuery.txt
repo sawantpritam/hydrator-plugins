@@ -1,0 +1,5 @@
+insert into `DATASET.TABLE_NAME` (Customer_BloodGroup, First_name, Last_name) values ('A', 'john', 'Doe'),
+('B', 'Jane', 'Doe'),
+('O','Dany','Roy'),('AB','Monu','Roy'),('B','Dane','Doe'),('A','Suhani','Roy'),('B','Abira','Rai'),('O','Dan','Roni'),
+('O','Bala','Soni'),
+('B','Rani','Roy'),('O','Ashu','Roy'),('O','Danial','Royi')

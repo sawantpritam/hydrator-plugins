@@ -1,0 +1,2 @@
+create table `DATASET.TABLE_NAME` ( Customer_BloodGroup STRING,
+ First_name STRING, Last_name STRING)
