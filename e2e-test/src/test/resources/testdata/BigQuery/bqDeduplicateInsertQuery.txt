@@ -1,0 +1,2 @@
+insert into `DATASET.TABLE_NAME` (fname, lname, cost, zipcode  ) values
+('bob','smith',50.23,12345), ('bob','jones',30.64,23456), ('alice','jones',500.93,67890),('alice','smith',30.21,56789);
