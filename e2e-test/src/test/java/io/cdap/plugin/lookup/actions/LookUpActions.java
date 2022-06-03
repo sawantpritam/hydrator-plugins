@@ -14,16 +14,16 @@
  * the License.
  */
 
-/**
- * LookUp plugin related Actions.
- */
-
 package io.cdap.plugin.lookup.actions;
 
 import io.cdap.e2e.utils.CdfHelper;
 import io.cdap.e2e.utils.SeleniumDriver;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.interactions.Actions;
+
+/**
+ * LookUp plugin related Actions.
+ */
 
 public class LookUpActions implements CdfHelper {
 

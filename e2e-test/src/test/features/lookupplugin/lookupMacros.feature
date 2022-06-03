@@ -1,8 +1,8 @@
 @LookUp
-Feature:LookUp - Verification of LookUp pipeline with BigQuery and GCS as source to target BigQuery2 using macros
+Feature:LookUp - Verification of LookUp pipeline with BigQuery and GCS as source to target BigQuery using macros
 
   @BQ_SOURCE_LOOKUP_TEST @GCS_CSV_LOOKUP_TEST @BQ_SINK_TEST
-  Scenario: To verify complete flow of data extract and transfer from BigQuery and GCS as source to target BigQuery2  with LookUp plugin properties as macro arguments
+  Scenario: To verify complete flow of data extract and transfer from BigQuery and GCS as source to target BigQuery with LookUp plugin properties as macro arguments
     Given Open Datafusion Project to configure pipeline
     When Select plugin: "GCS" from the plugins list as: "Source"
     When Expand Plugin group in the LHS plugins list: "Analytics"
@@ -31,11 +31,12 @@ Feature:LookUp - Verification of LookUp pipeline with BigQuery and GCS as source
     Then Close the Plugin Properties page
     Then Connect plugins: "BigQuery" and "Lookup" to establish connection
     Then Navigate to the properties page of plugin: "Lookup"
-    Then Click on the Macro button of Property: "Lookupdataset" and set the value to: "lookupdataset"
-    Then Click on the Macro button of Property: "Inputkeyfield" and set the value to: "lookUpInputKeyField"
-    Then Click on the Macro button of Property: "Lookupkeyfield" and set the value to: "lookUpKeyField"
-    Then Click on the Macro button of Property: "Lookupvaluefield" and set the value to: "lookUpValueField"
-    Then Click on the Macro button of Property: "Outputfield" and set the value to: "lookUpOutputField"
+    Then Click on the Macro button of Property: "lookUpDataSet" and set the value to: "lookUpDataSet"
+    Then Click on the Macro button of Property: "lookUpInputKeyField" and set the value to: "lookUpInputKeyField"
+    Then Click on the Macro button of Property: "lookUpKeyField" and set the value to: "lookUpKeyField"
+    Then Click on the Macro button of Property: "lookUpValueField" and set the value to: "lookUpValueField1"
+    Then Click on the Macro button of Property: "lookUpOutputField" and set the value to: "lookUpOutputField1"
+    Then Verify the Output Schema matches the Expected Schema: "lookUpOutputSchema"
     Then Validate "Lookup" plugin properties
     Then Close the Plugin Properties page
     When Expand Plugin group in the LHS plugins list: "Sink"
@@ -47,15 +48,16 @@ Feature:LookUp - Verification of LookUp pipeline with BigQuery and GCS as source
     Then Enter input plugin property: "referenceName" with value: "BQReferenceName"
     Then Enter input plugin property: "dataset" with value: "dataset"
     Then Enter input plugin property: "table" with value: "bqTargetTable"
+    Then Capture the generated Output Schema
     Then Validate "BigQuery2" plugin properties
     Then Close the Plugin Properties page
     Then Save the pipeline
     Then Preview and run the pipeline
-    Then Enter runtime argument value "Lookupdataset" for key "lookupdataset"
-    Then Enter runtime argument value "Inputkeyfield" for key "lookUpInputKeyField"
-    Then Enter runtime argument value "LookupKeyField" for key "lookUpKeyField"
-    Then Enter runtime argument value "Lookupvaluefield" for key "lookUpValueField"
-    Then Enter runtime argument value "Outputfield" for key "lookUpOutputField"
+    Then Enter runtime argument value "lookUpDataSet" for key "lookUpDataSet"
+    Then Enter runtime argument value "lookUpInputKeyField" for key "lookUpInputKeyField"
+    Then Enter runtime argument value "lookUpKeyField" for key "lookUpKeyField"
+    Then Enter runtime argument value "lookUpValueField1" for key "lookUpValueField1"
+    Then Enter runtime argument value "lookUpOutputField1" for key "lookUpOutputField1"
     Then Run the preview of pipeline with runtime arguments
     Then Wait till pipeline preview is in running state
     Then Open and capture pipeline preview logs
@@ -65,13 +67,14 @@ Feature:LookUp - Verification of LookUp pipeline with BigQuery and GCS as source
     Then Close the preview data
     Then Deploy the pipeline
     Then Run the Pipeline in Runtime
-    Then Enter runtime argument value "Lookupdataset" for key "lookupdataset"
-    Then Enter runtime argument value "Inputkeyfield" for key "lookUpInputKeyField"
-    Then Enter runtime argument value "LookupKeyField" for key "lookUpKeyField"
-    Then Enter runtime argument value "Lookupvaluefield" for key "lookUpValueField"
-    Then Enter runtime argument value "Outputfield" for key "lookUpOutputField"
+    Then Enter runtime argument value "lookUpDataSet" for key "lookUpDataSet"
+    Then Enter runtime argument value "lookUpInputKeyField" for key "lookUpInputKeyField"
+    Then Enter runtime argument value "lookUpKeyField" for key "lookUpKeyField"
+    Then Enter runtime argument value "lookUpValueField1" for key "lookUpValueField1"
+    Then Enter runtime argument value "lookUpOutputField1" for key "lookUpOutputField1"
     Then Run the Pipeline in Runtime with runtime arguments
     Then Wait till pipeline is in running state
     Then Open and capture logs
     Then Verify the pipeline status is "Succeeded"
     Then Close the pipeline logs
+    Then Verify columnList: "lookUpExpectedTargetTableColumnListWithMacro" of target BigQuery table: "bqTargetTable"

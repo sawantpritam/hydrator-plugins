@@ -14,10 +14,6 @@
  * the License.
  */
 
-/**
- * LookUp plugin related Stepsdesign
- */
-
 package io.cdap.plugin.lookup.stepsdesign;
 
 import io.cdap.e2e.utils.BigQueryClient;
@@ -27,9 +23,12 @@ import io.cdap.plugin.lookup.actions.LookUpActions;
 import io.cucumber.java.en.Then;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
-
 import java.io.IOException;
 import java.util.Optional;
+
+/**
+ * LookUp plugin related Stepsdesign
+ */
 
 public class LookUp implements CdfHelper {
 
