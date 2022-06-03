@@ -8,10 +8,10 @@ Feature:LookUp - Verify LookUp Plugin Error scenarios
     Then Navigate to the properties page of plugin: "Lookup"
     Then Click on the Validate button
     Then Verify mandatory property error for below listed properties:
-      |lookupDataset   |
-      |inputKeyField   |
-      |lookupKeyField  |
-      |lookupValueField|
+      | lookupDataset    |
+      | inputKeyField    |
+      | lookupKeyField   |
+      | lookupValueField |
 
   @BQ_SOURCE_LOOKUP_TEST @GCS_CSV_LOOKUP_TEST @BQ_SINK_TEST
   Scenario:Verify LookUp plugin error for Lookup value field not in dataset
@@ -48,7 +48,7 @@ Feature:LookUp - Verify LookUp Plugin Error scenarios
     Then Enter input plugin property: "lookUpValueField" with value: "lookUpValueField"
     Then Enter input plugin property: "lookUpOutputField" with value: "lookUpOutputField"
     Then Click on the Validate button
-    Then Verify that the Plugin is displaying an error message: "errorMessageLookUpWithLookupValueFieldNotFound" on the header
+    Then Verify that the Plugin is displaying an error message: "errorMessageLookUpValueFieldNotFound" on the header
 
   @BQ_SOURCE_LOOKUP_TEST @GCS_CSV_LOOKUP_TEST @BQ_SINK_TEST
   Scenario:Verify LookUp plugin error when select all Lookup datasets
@@ -87,4 +87,4 @@ Feature:LookUp - Verify LookUp Plugin Error scenarios
     Then Enter input plugin property: "lookUpValueField" with value: "lookUpValueField"
     Then Enter input plugin property: "lookUpOutputField" with value: "lookUpOutputField"
     Then Click on the Validate button
-    Then Verify that the Plugin is displaying an error message: "LookUpPluginErrorWhenSelectAllLookUpDatasets" on the header
+    Then Verify that the Plugin is displaying an error message: "errorMessageLookUpDatasetMissing" on the header

@@ -105,10 +105,9 @@ public class TestSetupHooks {
 
   @Before(order = 1, value = "@BQ_SOURCE_LOOKUP_TEST")
   public static void createSourceBQTableWithDifferentDataType() throws IOException, InterruptedException {
-    createSourceBQTableWithQueries(PluginPropertyUtils.pluginProp("lookUpmBQCreateTableQueryFile"),
-                                   PluginPropertyUtils.pluginProp("lookUpmBQInsertQueryFile"));
+    createSourceBQTableWithQueries(PluginPropertyUtils.pluginProp("lookUpBQCreateTableQueryFile"),
+                                   PluginPropertyUtils.pluginProp("lookUpBQInsertQueryFile"));
   }
-
 
   private static void createSourceBQTableWithQueries(String bqCreateTableQueryFile, String bqInsertDataQueryFile) throws
     IOException, InterruptedException {
