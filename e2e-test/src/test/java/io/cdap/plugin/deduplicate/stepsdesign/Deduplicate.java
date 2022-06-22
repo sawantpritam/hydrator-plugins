@@ -31,7 +31,7 @@ public class Deduplicate implements CdfHelper {
     DeduplicateActions.enterDeduplicateFilterOperationFieldName(PluginPropertyUtils.pluginProp(fieldName));
   }
 
-  @Then("Select File plugin property: filterOperation field function with value: {string}")
+  @Then("Select Deduplicate plugin property: filterOperation field function with value: {string}")
   public void selectFilePluginPropertyFilterOperationFieldFunctionWithValue(String function) {
     DeduplicateActions.selectDeduplicateFilterOperationFunction(PluginPropertyUtils.pluginProp(function));
   }
