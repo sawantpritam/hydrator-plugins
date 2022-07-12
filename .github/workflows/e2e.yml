@@ -46,12 +46,12 @@ jobs:
         with:
           path: plugin
       - uses: dorny/paths-filter@v2
-          id: filter
-          with:
-            working-directory: plugin
-            filters: |
-              core:
-                - 'core-plugins/**'
+        id: filter
+        with:
+          working-directory: plugin
+          filters: |
+            core:
+              - 'core-plugins/**'
       - name: Run required e2e tests for core-plugins
         if: >
           steps.filter.outputs.core == 'true' 
