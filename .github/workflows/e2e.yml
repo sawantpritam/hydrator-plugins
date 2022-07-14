@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        package: ${{ needs.paths.outputs.matrix }}
+        package: ${{ fromJson(needs.paths.outputs.matrix) }}
 
 
     # We allow builds:
