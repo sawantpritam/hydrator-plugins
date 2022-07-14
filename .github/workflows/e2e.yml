@@ -42,7 +42,7 @@ jobs:
             wf:  
               - '**'
     outputs:
-      matrix: 'xyz'
+      matrix: ${{ steps.filter.outputs.core }}
 
   build:
     needs: paths
