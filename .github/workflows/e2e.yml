@@ -40,9 +40,9 @@ jobs:
             core:
               - 'core-plugins/**'
             wf:  
-              - '**/workflows'
+              - '**'
     outputs:
-      matrix: ${{ steps.filters.outputs }}
+      matrix: ${{ steps.filter.outputs }}
 
   build:
     needs: paths
