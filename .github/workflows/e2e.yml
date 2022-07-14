@@ -47,9 +47,9 @@ jobs:
   build:
     needs: paths
     runs-on: ubuntu-latest
-#     strategy:
-#       matrix:
-#         package: ${{ needs.paths.outputs.matrix }}
+    strategy:
+      matrix:
+        package: ${{ needs.paths.outputs.matrix }}
 
 
     # We allow builds:
