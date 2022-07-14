@@ -16,7 +16,9 @@ name: Build e2e tests
 
 on:
   push:
-    branches: [ yml-check, workflow-test ]
+    branches:
+      - 'yml-check'
+      - 'workflow-test'
   pull_request:
     branches: [ yml-check, workflow-test ]
     types: [opened, synchronize, reopened, labeled]
