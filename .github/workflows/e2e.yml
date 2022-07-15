@@ -36,11 +36,6 @@ jobs:
         id: filter
         with:
           working-directory: plugin
-          filters: |
-            core:
-              - 'core-plugins/**'
-            wf:  
-              - '**'
     outputs:
       matrix: ${{ steps.filter.outputs.changes }}
 
