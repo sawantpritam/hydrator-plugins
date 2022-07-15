@@ -25,7 +25,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  paths:
+  modules:
     runs-on: ubuntu-latest
     steps:
       # Pinned 1.0.0 version
@@ -38,16 +38,16 @@ jobs:
           working-directory: plugin
           filters: |
             core:
-              - 'core-plugins/**'
+              - 'database-plugins/**'
     outputs:
       matrix: ${{ steps.filter.outputs.changes }}
 
   build:
-    needs: paths
+    needs: modules
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        module: ${{ fromJson(needs.paths.outputs.matrix) }}
+        module: ${{ fromJson(needs.modules.outputs.matrix) }}
 
 
     # We allow builds:
@@ -80,7 +80,7 @@ jobs:
         if: github.event_name != 'workflow_dispatch' && (!contains( github.event.head_commit.message, 'Merge pull request'))
         run: echo "COREEEE REQUIRED ${{ matrix.module }}"
       - name: check
-        run: echo "hi ${{ needs.paths.outputs.matrix }}" 
+        run: echo "hi ${{ needs.modules.outputs.matrix }}" 
 #       - name: check
 #         if: ${{ matrix.os == 'windows-latest'}}
 #         run: echo "hi ${{ matrix.os}}" 
