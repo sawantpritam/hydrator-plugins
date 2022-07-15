@@ -38,7 +38,7 @@ jobs:
           working-directory: plugin
           filters: |
             core:
-              - 'database-plugins/**'
+              - 'core-plugins/**'
     outputs:
       matrix: ${{ steps.filter.outputs.changes }}
 
@@ -68,6 +68,11 @@ jobs:
       - uses: actions/checkout@v2.3.4
         with:
           path: plugin
+      - name: Checkout e2e test repo
+        uses: actions/checkout@v2.3.4
+        with:
+          repository: cdapio/cdap-e2e-tests
+          path: e2e
 #       - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
 #         id: filter
 #         with:
@@ -77,7 +82,7 @@ jobs:
 #               - 'core-plugins/**'
       - name: Run required e2e tests
         if: github.event_name != 'workflow_dispatch' && (!contains( github.event.head_commit.message, 'Merge pull request'))
-        run: echo "COREEEE REQUIRED ${{ matrix.module }}"
+        run: python3 e2e/src/main/scripts/run_e2e_test.py --module ${{ matrix.module }} --testRunner TestRunnerRequired.java
       - name: check
         run: echo "hi ${{ needs.modules.outputs.matrix }}" 
 #       - name: check
