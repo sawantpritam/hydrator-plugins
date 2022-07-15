@@ -37,8 +37,8 @@ jobs:
         with:
           working-directory: plugin
           filters: |
-            core:
-              - 'core-plugins/**'
+            core-plugins:
+              - 'database-plugins/**'
     outputs:
       matrix: ${{ steps.filter.outputs.changes }}
 
