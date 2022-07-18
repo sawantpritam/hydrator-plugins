@@ -53,17 +53,11 @@ jobs:
 #         if: github.event_name == 'workflow_dispatch'
 #         run: echo "::set-output name=matrix::{\"include\":[{\"project\":\"foo\",\"config\":\"Debug\"},{\"project\":\"bar\",\"config\":\"Release\"}]}"
       - name: pq
-        run: echo "${{ steps.xy.outputs.matrix  }}"
+        run: echo "${{ toJSON(steps.xy.outputs.matrix)  }}"
       - name: asasa
         run: echo "${{ steps.filter.outputs.changes  }}"
     outputs:
-      matrix: |
-          if [ ${{ github.event_name }} != 'aaa' ]; then
-            echo "['1','2','3']"
-          else
-            echo "['4','5','6']"
-          fi
-#       matrix: ${{ steps.xy.outputs.matrix }}
+      matrix: ${{ toJSON(steps.xy.outputs.matrix) }}
 
   build:
     needs: modules
