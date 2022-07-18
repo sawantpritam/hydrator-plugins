@@ -41,11 +41,22 @@ jobs:
               - 'core-plugins/**'
       - name: Set output
         run: echo "::set-output name=matrix::${{ steps.filter.outputs.changes }}"
+      - name: xyz
+        id: xy
+        run: |
+          if [ ${{ github.event_name }} == 'workflow_dispatch' ]; then
+            echo "W D"
+            echo "::set-output name=matrix::${{ steps.filter.outputs.changes }}"
+          else
+            echo "O EEEE"
+            echo "::set-output name=matrix::['a','b','c']"
+          fi
+        shell: bash
 #       - name: Run all e2e tests
 #         if: github.event_name == 'workflow_dispatch'
 #         run: echo "::set-output name=matrix::{\"include\":[{\"project\":\"foo\",\"config\":\"Debug\"},{\"project\":\"bar\",\"config\":\"Release\"}]}"
-#     outputs:
-#       matrix: ${{ steps.filter.outputs.changes }}
+    outputs:
+      matrix: ${{ steps.xy.outputs.matrix }}
 
   build:
     needs: modules
