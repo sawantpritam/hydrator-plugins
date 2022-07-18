@@ -46,7 +46,7 @@ jobs:
         run: |
           if [ ${{ github.event_name }} == 'workflow_dispatch' ]; then
             echo "W D"
-            echo "::set-output name=matrix::${{ steps.filter.outputs.changes }}"
+            echo "::set-output name=matrix::${{ fromJson(steps.filter.outputs.changes) }}"
           else
             echo "O EEEE"
             echo "::set-output name=matrix::['a','b','c']"
@@ -56,7 +56,7 @@ jobs:
 #         if: github.event_name == 'workflow_dispatch'
 #         run: echo "::set-output name=matrix::{\"include\":[{\"project\":\"foo\",\"config\":\"Debug\"},{\"project\":\"bar\",\"config\":\"Release\"}]}"
     outputs:
-      matrix: ${{ fromJson(steps.xy.outputs.matrix) }}
+      matrix: ${{ steps.xy.outputs.matrix }}
 
   build:
     needs: modules
@@ -78,7 +78,7 @@ jobs:
          ))
     strategy:
       matrix:
-        module: ${{ needs.modules.outputs.matrix }}
+        module: ${{ fromJson(needs.modules.outputs.matrix) }}
     steps:
       # Pinned 1.0.0 version
       - uses: actions/checkout@v2.3.4
