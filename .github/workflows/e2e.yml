@@ -56,7 +56,7 @@ jobs:
 #         if: github.event_name == 'workflow_dispatch'
 #         run: echo "::set-output name=matrix::{\"include\":[{\"project\":\"foo\",\"config\":\"Debug\"},{\"project\":\"bar\",\"config\":\"Release\"}]}"
     outputs:
-      matrix: ${{ steps.xy.outputs.matrix }}
+      matrix: ${{ fromJson(steps.xy.outputs.matrix) }}
 
   build:
     needs: modules
