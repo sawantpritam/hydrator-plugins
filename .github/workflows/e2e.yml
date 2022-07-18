@@ -78,7 +78,7 @@ jobs:
          ))
     strategy:
       matrix:
-        module: ${{ (needs.modules.outputs.matrix) }}
+        module: ${{ needs.modules.outputs.matrix }}
     steps:
       # Pinned 1.0.0 version
       - uses: actions/checkout@v2.3.4
