@@ -44,7 +44,7 @@ jobs:
         run: |
           if [ ${{ github.event_name }} != 'aaa' ]; then
             echo "W D"
-            echo "::set-output name=matrix::${{ fromJSON(steps.filter.outputs.changes) }}"
+            echo "::set-output name=matrix::${{ steps.filter.outputs.changes }}"
           else
             echo "O EEEE"
             echo "::set-output name=matrix::['a','b','c']"
@@ -58,10 +58,6 @@ jobs:
         run: echo "${{ toJSON(steps.xy.outputs.matrix)  }}"
       - name: direct
         run: echo "${{ steps.filter.outputs.changes  }}"
-      - name: fromJSONondir
-        run: echo "${{ fromJSON(steps.filter.outputs.changes)  }}"
-      - name: toJSONfromJSONondir
-        run: echo "${{ toJSON(fromJSON(steps.filter.outputs.changes))  }}"
     outputs:
       matrix: ${{ toJSON(steps.xy.outputs.matrix) }}
 
