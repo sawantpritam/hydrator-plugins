@@ -53,6 +53,10 @@ jobs:
 #       - name: Run all e2e tests
 #         if: github.event_name == 'workflow_dispatch'
 #         run: echo "::set-output name=matrix::{\"include\":[{\"project\":\"foo\",\"config\":\"Debug\"},{\"project\":\"bar\",\"config\":\"Release\"}]}"
+      - name: pq
+        run: echo "${{ steps.xy.outputs.matrix  }}"
+      - name: asasa
+        run: echo "${{ steps.filter.outputs.changes  }}"
     outputs:
       matrix: ${{ steps.xy.outputs.matrix }}
 
