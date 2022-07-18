@@ -39,14 +39,12 @@ jobs:
           filters: |
             core-plugins:
               - 'core-plugins/**'
-      - name: Set output
-        run: echo "::set-output name=matrix::${{ steps.filter.outputs.changes }}"
       - name: xyz
         id: xy
         run: |
-          if [ ${{ github.event_name }} == 'workflow_dispatch' ]; then
+          if [ ${{ github.event_name }} != 'aaa' ]; then
             echo "W D"
-            echo "::set-output name=matrix::${{ fromJson(steps.filter.outputs.changes) }}"
+            echo "::set-output name=matrix::${{ steps.filter.outputs.changes }}"
           else
             echo "O EEEE"
             echo "::set-output name=matrix::['a','b','c']"
