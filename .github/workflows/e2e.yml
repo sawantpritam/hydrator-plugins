@@ -22,7 +22,6 @@ on:
   pull_request:
     branches: [ yml-check, workflow-test ]
     types: [opened, synchronize, reopened, labeled]
-  workflow_dispatch:
 
 jobs:
   modules:
