@@ -57,7 +57,13 @@ jobs:
       - name: asasa
         run: echo "${{ steps.filter.outputs.changes  }}"
     outputs:
-      matrix: ${{ steps.xy.outputs.matrix }}
+      matrix: |
+          if [ ${{ github.event_name }} != 'aaa' ]; then
+            echo "['1','2','3']"
+          else
+            echo "['4','5','6']"
+          fi
+#       matrix: ${{ steps.xy.outputs.matrix }}
 
   build:
     needs: modules
