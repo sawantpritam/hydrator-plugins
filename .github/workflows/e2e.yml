@@ -43,7 +43,8 @@ jobs:
         run: |
           if [ ${{ github.event_name }} != 'aaa' ]; then
             echo "W D"
-            echo "JSON_STRING=$( ${{ steps.filter.outputs.changes }} | jq '.')"
+            echo ${{ steps.filter.outputs.changes }} | jq '.'
+            echo "JSON_STRING=$( '${{ steps.filter.outputs.changes }}' | jq '.')"
             echo "::set-output name=matrix::$JSON_STRING"
             echo "$JSON_STRING"
           else
