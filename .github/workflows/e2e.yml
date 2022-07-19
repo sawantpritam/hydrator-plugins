@@ -43,7 +43,10 @@ jobs:
         run: |
           if [ ${{ github.event_name }} != 'aaa' ]; then
             echo "W D"
-            echo "JSON_STRING=$( jq '.' '["core"]' )"
+            echo "JSON_STRING=$( '["core"]' | jq '.')"
+            echo "JSON_STRING=$( ["core"] | jq '.')"
+            echo "JSON_STRING=$( jq '.' <<< '["core"]')"
+            echo "JSON_STRING=$( jq '.' <<< ["core"])"
             echo "JSON_STRING=$( '${{ steps.filter.outputs.changes }}' | jq '.')"
             echo "::set-output name=matrix::$JSON_STRING"
             echo "$JSON_STRING"
@@ -51,6 +54,7 @@ jobs:
             echo "O EEEE"
             echo "::set-output name=matrix::['a','b','c']"
           fi
+        shell: bash
 #       - name: Run all e2e tests
 #         if: github.event_name == 'workflow_dispatch'
 #         run: echo "::set-output name=matrix::{\"include\":[{\"project\":\"foo\",\"config\":\"Debug\"},{\"project\":\"bar\",\"config\":\"Release\"}]}"
