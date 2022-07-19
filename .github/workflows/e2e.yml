@@ -37,7 +37,7 @@ jobs:
           working-directory: plugin
           filters: |
             core-plugins:
-              - 'core-plugins/**'
+              - '**/**'
       - name: xyz
         id: xy
         run: |
