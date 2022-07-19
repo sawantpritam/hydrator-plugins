@@ -33,6 +33,7 @@ jobs:
         with:
           path: plugin
       - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
+        if: github.event_name != 'workflow_dispatch'  
         id: filter
         with:
           working-directory: plugin
