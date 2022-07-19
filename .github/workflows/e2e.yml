@@ -22,6 +22,7 @@ on:
   pull_request:
     branches: [ yml-check, workflow-test ]
     types: [opened, synchronize, reopened, labeled]
+  workflow_dispatch:
 
 jobs:
   modules:
@@ -41,14 +42,13 @@ jobs:
       - name: xyz
         id: xy
         run: |
-          if [ ${{ github.event_name }} != 'aaa' ]; then
-            echo "W D"
+          if [ ${{ github.event_name }} != 'workflow_dispatch' ]; then
+            echo " ! W D"
             echo "JSON_STRING=$( jq '.' --compact-output <<< '${{ steps.filter.outputs.changes }}')"
             echo "::set-output name=matrix::$( jq '.' --compact-output <<< '${{ steps.filter.outputs.changes }}')"
-            echo "$JSON_STRING"
           else
-            echo "O EEEE"
-            echo "::set-output name=matrix::['a','b','c']"
+            echo "W D"
+            echo "::set-output name=matrix::['a','b']"
           fi
         shell: bash
 #       - name: Run all e2e tests
@@ -56,10 +56,6 @@ jobs:
 #         run: echo "::set-output name=matrix::{\"include\":[{\"project\":\"foo\",\"config\":\"Debug\"},{\"project\":\"bar\",\"config\":\"Release\"}]}"
       - name: steppdir
         run: echo "${{ steps.xy.outputs.matrix  }}"
-      - name: stepTojson
-        run: echo "${{ toJSON(steps.xy.outputs.matrix)  }}"
-      - name: direct
-        run: echo "${{ steps.filter.outputs.changes  }}"
     outputs:
       matrix: ${{ steps.xy.outputs.matrix }}
 
