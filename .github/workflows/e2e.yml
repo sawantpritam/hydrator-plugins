@@ -69,7 +69,7 @@ jobs:
         path: plugin
     - name: Get directory names
       id: get-directory-names
-      uses: featherweight-design/collect-directory-names-by-file-glob@v1.1
+      uses: featherweight-design/collect-directory-names-by-file-glob@v1.2.2
       with:
         file-glob: '**/*Test'
         search-directory: '/plugin'
