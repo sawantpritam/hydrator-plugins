@@ -25,43 +25,61 @@ on:
   workflow_dispatch:
 
 jobs:
-  modules:
-    runs-on: ubuntu-latest
-    steps:
-      # Pinned 1.0.0 version
-      - uses: actions/checkout@v2.3.4
-        with:
-          path: plugin
-      - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
-        if: github.event_name != 'workflow_dispatch'  
-        id: filter
-        with:
-          working-directory: plugin
-          filters: |
-            core-plugins:
-              - 'core-plugins/**'
-      - name: xyz
-        id: xy
-        run: |
-          if [ ${{ github.event_name }} != 'workflow_dispatch' ]; then
-            echo " ! W D"
-            echo "JSON_STRING=$( jq '.' --compact-output <<< '${{ steps.filter.outputs.changes }}')"
-            echo "::set-output name=matrix::$( jq '.' --compact-output <<< '${{ steps.filter.outputs.changes }}')"
-          else
-            echo "W D"
-            echo "::set-output name=matrix::['a','b']"
-          fi
-        shell: bash
-#       - name: Run all e2e tests
-#         if: github.event_name == 'workflow_dispatch'
-#         run: echo "::set-output name=matrix::{\"include\":[{\"project\":\"foo\",\"config\":\"Debug\"},{\"project\":\"bar\",\"config\":\"Release\"}]}"
-      - name: steppdir
-        run: echo "${{ steps.xy.outputs.matrix  }}"
-    outputs:
-      matrix: ${{ steps.xy.outputs.matrix }}
+#   modules:
+#     runs-on: ubuntu-latest
+#     steps:
+#       # Pinned 1.0.0 version
+#       - uses: actions/checkout@v2.3.4
+#         with:
+#           path: plugin
+#       - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
+#         if: github.event_name != 'workflow_dispatch'  
+#         id: filter
+#         with:
+#           working-directory: plugin
+#           filters: |
+#             core-plugins:
+#               - 'core-plugins/**'
+#       - name: xyz
+#         id: xy
+#         run: |
+#           if [ ${{ github.event_name }} != 'workflow_dispatch' ]; then
+#             echo " ! W D"
+#             echo "JSON_STRING=$( jq '.' --compact-output <<< '${{ steps.filter.outputs.changes }}')"
+#             echo "::set-output name=matrix::$( jq '.' --compact-output <<< '${{ steps.filter.outputs.changes }}')"
+#           else
+#             echo "W D"
+#             echo "::set-output name=matrix::['a','b']"
+#           fi
+#         shell: bash
+# #       - name: Run all e2e tests
+# #         if: github.event_name == 'workflow_dispatch'
+# #         run: echo "::set-output name=matrix::{\"include\":[{\"project\":\"foo\",\"config\":\"Debug\"},{\"project\":\"bar\",\"config\":\"Release\"}]}"
+#       - name: steppdir
+#         run: echo "${{ steps.xy.outputs.matrix  }}"
+#     outputs:
+#       matrix: ${{ steps.xy.outputs.matrix }}
 
+  test:
+    runs-on: ubuntu-latest
+    name: Test Collect Directory Names action
+    steps:
+    - uses: actions/checkout@v2.3.4
+      with:
+        path: plugin
+    - name: Get directory names
+      id: get-directory-names
+      uses: actions/collect-directory-names-by-file-glob@v1.1
+      with:
+        file-glob: '**/*Test'
+        search-directory: '/plugin'
+        unique: "true"
+
+    - name: Use Directory Names
+      run: echo "Directory Names are ${{ steps.get-directory-names.outputs.directory-names}}
+  
   build:
-    needs: modules
+#     needs: modules
     runs-on: ubuntu-latest
   
     # We allow builds:
@@ -80,7 +98,9 @@ jobs:
          ))
     strategy:
       matrix:
-        module: ${{ fromJson(needs.modules.outputs.matrix) }}
+        mod: [p1,p2,p3,p4,p5]
+      
+#         module: ${{ fromJson(needs.modules.outputs.matrix) }}
     steps:
       # Pinned 1.0.0 version
       - uses: actions/checkout@v2.3.4
@@ -100,7 +120,7 @@ jobs:
 #               - 'core-plugins/**'
       - name: Run required e2e tests
         if: github.event_name != 'workflow_dispatch' && (!contains( github.event.head_commit.message, 'Merge pull request'))
-        run: python3 e2e/src/main/scripts/run_e2e_test.py --module ${{ matrix.module }} --testRunner TestRunnerRequired.java
+        run: python3 e2e/src/main/scripts/run_e2e_test.py --testRunner **/${{ matrix.mod }}/**/TestRunner.java
       - name: check
         run: echo "hi ${{ needs.modules.outputs.matrix }}" 
 #       - name: check
