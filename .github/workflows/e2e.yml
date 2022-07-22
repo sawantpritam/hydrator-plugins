@@ -98,7 +98,7 @@ jobs:
 #          ))
     strategy:
       matrix:
-        mod: [core-plugins,p2]
+        mod: [core-plugins]
       
 #         module: ${{ fromJson(needs.modules.outputs.matrix) }}
     steps:
@@ -116,10 +116,13 @@ jobs:
         with:
           working-directory: plugin
           filters: |
-            core:
+            e2e-tests:
               - '${{ matrix.mod }}/**/e2e-test/**'
       - name: Run required e2e tests
-        if: github.event_name != 'workflow_dispatch' && (!contains( github.event.head_commit.message, 'Merge pull request'))
+        if: github.event_name != 'workflow_dispatch' && (!contains( github.event.head_commit.message, 'Merge pull request')) && steps.filter.outputs.changes.e2e-tests==false
+        run: python3 e2e/src/main/scripts/run_e2e_test.py --testRunner **/${{ matrix.mod }}/**/TestRunner.java
+      - name: Run all e2e tests
+        if: steps.filter.outputs.changes.e2e-tests==true
         run: python3 e2e/src/main/scripts/run_e2e_test.py --testRunner **/${{ matrix.mod }}/**/TestRunner.java
       - name: check
         run: echo "hi ${{ needs.modules.outputs.matrix }}" 
