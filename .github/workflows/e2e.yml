@@ -117,9 +117,7 @@ jobs:
           working-directory: plugin
           filters: |
             core:
-              - '${{ matrix.mod }}/**'
-            xyz:
-              - ${{ matrix.mod }}'/**'
+              - '${{ matrix.mod }}/**/e2e-test/**'
       - name: Run required e2e tests
         if: github.event_name != 'workflow_dispatch' && (!contains( github.event.head_commit.message, 'Merge pull request'))
         run: python3 e2e/src/main/scripts/run_e2e_test.py --testRunner **/${{ matrix.mod }}/**/TestRunner.java
