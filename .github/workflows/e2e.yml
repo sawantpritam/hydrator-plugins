@@ -60,23 +60,23 @@ jobs:
 #     outputs:
 #       matrix: ${{ steps.xy.outputs.matrix }}
 
-  test:
-    runs-on: ubuntu-latest
-    name: Test Collect Directory Names action
-    steps:
-    - uses: actions/checkout@v2.3.4
-      with:
-        path: plugin
-    - name: Get directory names
-      id: get-directory-names
-      uses: featherweight-design/collect-directory-names-by-file-glob@v1.2.2
-      with:
-        file-glob: '**/runners/**'
-        search-directory: '/plugin'
-        unique: "true"
+#   test:
+#     runs-on: ubuntu-latest
+#     name: Test Collect Directory Names action
+#     steps:
+#     - uses: actions/checkout@v2.3.4
+#       with:
+#         path: plugin
+#     - name: Get directory names
+#       id: get-directory-names
+#       uses: featherweight-design/collect-directory-names-by-file-glob@v1.2.2
+#       with:
+#         file-glob: '**/runners/**'
+#         search-directory: '/plugin'
+#         unique: "true"
 
-    - name: Use Directory Names
-      run: echo "Directory Names are ${{ steps.get-directory-names.outputs.directory-names}}
+#     - name: Use Directory Names
+#       run: echo "Directory Names are ${{ steps.get-directory-names.outputs.directory-names}}
   
   build:
 #     needs: modules
@@ -118,14 +118,16 @@ jobs:
           filters: |
             e2e-tests:
               - '${{ matrix.mod }}/**/e2e-test/**'
-      - name: Run required e2e tests
-        if: github.event_name != 'workflow_dispatch' && (!contains( github.event.head_commit.message, 'Merge pull request')) && steps.filter.outputs.e2e-tests == 'false'
-        run: python3 e2e/src/main/scripts/run_e2e_test.py --testRunner **/${{ matrix.mod }}/**/TestRunner.java
-      - name: Run all e2e tests
-        if: steps.filter.outputs.e2e-tests == 'true'
-        run: python3 e2e/src/main/scripts/run_e2e_test.py --testRunner **/${{ matrix.mod }}/**/TestRunner.java
-      - name: check
-        run: echo "hi ${{ needs.modules.outputs.matrix }}" 
+      - name: Run
+        run: python3 plugin/core-plugins/run_e2e_test.py
+#       - name: Run required e2e tests
+#         if: github.event_name != 'workflow_dispatch' && (!contains( github.event.head_commit.message, 'Merge pull request')) && steps.filter.outputs.e2e-tests == 'false'
+#         run: python3 e2e/src/main/scripts/run_e2e_test.py --testRunner **/${{ matrix.mod }}/**/TestRunner.java
+#       - name: Run all e2e tests
+#         if: steps.filter.outputs.e2e-tests == 'true'
+#         run: python3 e2e/src/main/scripts/run_e2e_test.py --testRunner **/${{ matrix.mod }}/**/TestRunner.java
+#       - name: check
+#         run: echo "hi ${{ needs.modules.outputs.matrix }}" 
 #       - name: check
 #         if: ${{ matrix.os == 'windows-latest'}}
 #         run: echo "hi ${{ matrix.os}}" 
