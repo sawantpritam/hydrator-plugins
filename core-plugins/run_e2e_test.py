@@ -49,11 +49,16 @@ print("ls:", os.listdir())
 
 print("Downloading jar")
 gcs_jar_url = "https://storage.googleapis.com/hadoop-lib/gcs/gcs-connector-hadoop2-2.2.5.jar"
-gcs_jar_fname = "abc-connector-hadoop2-2.2.5.jar"
+gcs_jar_fname = f"sandbox/{sandbox_dir}/lib/abc-connector-hadoop2-2.2.5.jar"
 urllib.request.urlretrieve(gcs_jar_url, gcs_jar_fname)
 
 print("cwd:", os.getcwd())
 print("ls:", os.listdir())
+
+os.chdir("sandbox/lib")
+
+print("cwd1:", os.getcwd())
+print("ls1:", os.listdir())
 
 
 print("Start the sandbox")
