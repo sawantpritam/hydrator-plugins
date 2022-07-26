@@ -55,7 +55,7 @@ urllib.request.urlretrieve(gcs_jar_url, gcs_jar_fname)
 print("cwd:", os.getcwd())
 print("ls:", os.listdir())
 
-os.chdir("sandbox/lib")
+os.chdir(f"sandbox/{sandbox_dir}/lib")
 
 print("cwd1:", os.getcwd())
 print("ls1:", os.listdir())
