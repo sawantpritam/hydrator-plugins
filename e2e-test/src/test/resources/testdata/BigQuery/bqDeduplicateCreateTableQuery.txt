@@ -1,0 +1,2 @@
+create table `DATASET.TABLE_NAME` ( fname STRING,
+lname STRING, cost FLOAT64, zipcode INT64)
